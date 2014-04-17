@@ -10,7 +10,7 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'pycut = pycut:pycut',
+            'pycut = pycut.pycut:main',
             ]
         },
     install_requires = [],
