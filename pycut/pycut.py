@@ -1,6 +1,7 @@
 from sys import argv, stderr
 from random import shuffle
 from PIL import Image, ImageFilter
+from os import path
 
 def usage():
     stderr.write(("Usage : pycut IMAGE [WIDTHxHEIGHT]\n"))
@@ -17,10 +18,12 @@ def parse_args():
         usage()
     return argv[1], w, h
 
-def pycut(image_name, width, height):
+def pycut(image_name, width, height, fmt=lambda x: chr(ord('a') + x)):
     image = Image.open(image_name)
+    filename = path.basename(image_name)
+    dirname = path.dirname(image_name)
     blur = image.filter(ImageFilter.GaussianBlur(125))
-    blur.save("0blured-{}".format(image_name))
+    blur.save("blured-{}".format(filename))
 
     if not (width > 0 and height > 0):
         return 0
@@ -35,7 +38,7 @@ def pycut(image_name, width, height):
             for y in range(ph):
                 images[i].putpixel((x + pw * (part % width), y + ph * (part / width)), 
                                    image.getpixel((x + pw * (part % width), y + ph * (part / width))))
-        images[i].save("{}-{}".format(chr(ord('a') + i), image_name))
+        images[i].save(dirname + '/' + fmt(i) + filename)
         images.append(images[i].copy())
 
     return images
