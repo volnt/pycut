@@ -13,5 +13,5 @@ setup(
             'pycut = pycut.pycut:main',
             ]
         },
-    install_requires = [],
+    install_requires = ["Pillow==2.4.0"],
 )
