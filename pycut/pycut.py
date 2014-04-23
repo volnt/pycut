@@ -20,10 +20,11 @@ def parse_args():
 
 def pycut(image_name, width, height, fmt=lambda x: chr(ord('a') + x)):
     image = Image.open(image_name)
+    image.thumbnail((1920, 1080), Image.ANTIALIAS)
     filename = path.basename(image_name)
     dirname = path.dirname(image_name)
     blur = image.filter(ImageFilter.GaussianBlur(125))
-    blur.save("blured-{}".format(filename))
+    blur.save(path.join(dirname, "blured-{}".format(filename)))
 
     if not (width > 0 and height > 0):
         return 0
@@ -38,7 +39,7 @@ def pycut(image_name, width, height, fmt=lambda x: chr(ord('a') + x)):
             for y in range(ph):
                 images[i].putpixel((x + pw * (part % width), y + ph * (part / width)), 
                                    image.getpixel((x + pw * (part % width), y + ph * (part / width))))
-        images[i].save(dirname + '/' + fmt(i) + filename)
+        images[i].save(path.join(dirname, fmt(i) + filename))
         images.append(images[i].copy())
 
     return images
