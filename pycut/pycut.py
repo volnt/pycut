@@ -18,7 +18,11 @@ def parse_args():
         usage()
     return argv[1], w, h
 
-def pycut(image_name, width, height, fmt=lambda x: chr(ord('a') + x)):
+def get_pos_color_pixel(x, y, image):
+    # print x, y
+    return ((x, y), image.getpixel((x, y)))
+
+def pycut(image_name, width, height, fmt=lambda x: "{}-".format(chr(ord('a') + x)), factor=10):
     image = Image.open(image_name)
     image.thumbnail((1920, 1080), Image.ANTIALIAS)
     filename = path.basename(image_name)
@@ -29,18 +33,23 @@ def pycut(image_name, width, height, fmt=lambda x: chr(ord('a') + x)):
     if not (width > 0 and height > 0):
         return 0
 
+    width *= factor
+    height *= factor
     rparts = range(width * height)
-    pw, ph = image.size[0] / width, image.size[1] / height
+    pw, ph = image.size[0] / (width), image.size[1] / (height)
     images = [blur.copy()]
     shuffle(rparts)
 
     for i, part in enumerate(rparts):
         for x in xrange(pw):
             for y in range(ph):
-                images[i].putpixel((x + pw * (part % width), y + ph * (part / width)), 
-                                   image.getpixel((x + pw * (part % width), y + ph * (part / width))))
-        images[i].save(path.join(dirname, fmt(i) + filename))
-        images.append(images[i].copy())
+                images[i / factor ** 2].putpixel(*get_pos_color_pixel(x + pw * (part % (width)), 
+                                                                 y + ph * (part / (width)), 
+                                                                 image))
+
+        if not (i + 1) % factor ** 2:
+            images[i / factor ** 2].save(path.join(dirname, fmt(i / factor ** 2) + filename))
+            images.append(images[i / factor ** 2].copy())
 
     return images
 
